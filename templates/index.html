@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediExpert - AI Medicine Advisor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --success: #059669;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            color: var(--gray-600);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .disclaimer {
+            background: var(--primary-light);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .card-header i {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: background-color 0.2s ease;
+        }
+
+        .checkbox-group:hover {
+            background: var(--gray-50);
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Symptoms Grid */
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .symptom-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .symptom-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .symptom-option.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .symptom-option input {
+            display: none;
+        }
+
+        /* Custom Symptoms */
+        .custom-symptom {
+            display: flex;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .custom-symptom input {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-600);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-800);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        /* Severity Options */
+        .severity-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .severity-option {
+            text-align: center;
+        }
+
+        .severity-option input {
+            display: none;
+        }
+
+        .severity-label {
+            display: block;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .severity-option input:checked + .severity-label {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .severity-mild .severity-label {
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .severity-moderate .severity-label {
+            border-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .severity-severe .severity-label {
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Results Section */
+        #resultsSection {
+            display: none;
+        }
+
+        .emergency-alert {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            color: #991b1b;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .emergency-alert i {
+            font-size: 1.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .medicine-card {
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .medicine-card:hover {
+            transform: translateX(4px);
+        }
+
+        .medicine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .medicine-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .confidence {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .medicine-type {
+            display: inline-block;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        .medicine-details {
+            margin-bottom: 1rem;
+        }
+
+        .warning {
+            color: var(--danger);
+            font-weight: 500;
+            margin: 0.75rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .advice {
+            color: var(--success);
+            font-style: italic;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom Symptoms Tags */
+        .custom-symptoms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .custom-symptom-tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .custom-symptom-tag button {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Footer */
+        footer {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .disclaimer-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            text-align: left;
+        }
+
+        .copyright {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .logo h1 {
+                font-size: 2rem;
+            }
+
+            .symptoms-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .severity-options {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .disclaimer-text {
+                text-align: center;
+            }
+        }
+
+        /* Animation for results */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <h1>MediExpert</h1>
+            </div>
+            <div class="tagline">Medicine Recommendation System</div>
+            <div class="disclaimer">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Important:</strong> This system provides educational information only. 
+                Always consult healthcare professionals for medical advice.
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column - Input Form -->
+            <div class="left-column">
+                <!-- Patient Information Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-injured"></i>
+                        <h2>Patient Information</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">
+                            <i class="fas fa-birthday-cake"></i> Age
+                        </label>
+                        <input type="number" id="age" class="form-control" 
+                               placeholder="Enter your age" min="1" max="100" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">
+                            <i class="fas fa-venus-mars"></i> Gender
+                        </label>
+                        <select id="gender" class="form-control" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-heartbeat"></i> Special Conditions
+                        </label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="pregnancy">
+                            <label for="Aged">Aged Person</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="pregnancy">
+                            <label for="pregnancy">Pregnancy</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="allergies">
+                            <label for="allergies">Known Allergies</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="chronic">
+                            <label for="chronic">Chronic Conditions</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Symptoms Selection Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-notes-medical"></i>
+                        <h2>Select Your Symptoms</h2>
+                    </div>
+                    
+                    <div class="symptoms-grid" id="symptomsGrid">
+                        <!-- Symptoms loaded by JavaScript -->
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customSymptom">
+                            <i class="fas fa-plus-circle"></i> Add Custom Symptom
+                        </label>
+                        <div class="custom-symptom">
+                            <input type="text" id="customSymptom" class="form-control" 
+                                   placeholder="Describe your symptom...">
+                            <button class="btn btn-success" onclick="addCustomSymptom()">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div class="custom-symptoms" id="customSymptomsList">
+                            <!-- Custom symptoms will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Severity & Results -->
+            <div class="right-column">
+                <!-- Severity Assessment Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Symptom Severity</h2>
+                    </div>
+                    
+                    <div class="severity-options">
+                        <div class="severity-option severity-mild">
+                            <input type="radio" id="severity-mild" name="severity" value="mild" checked>
+                            <label for="severity-mild" class="severity-label">
+                                <i class="fas fa-smile"></i><br>
+                                Mild
+                            </label>
+                        </div>
+                        <div class="severity-option severity-moderate">
+                            <input type="radio" id="severity-moderate" name="severity" value="moderate">
+                            <label for="severity-moderate" class="severity-label">
+                                <i class="fas fa-meh"></i><br>
+                                Moderate
+                            </label>
+                        </div>
+                        <div class="severity-option severity-severe">
+                            <input type="radio" id="severity-severe" name="severity" value="severe">
+                            <label for="severity-severe" class="severity-label">
+                                <i class="fas fa-frown"></i><br>
+                                Severe
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="getRecommendations()" id="diagnoseBtn">
+                            <i class="fas fa-stethoscope"></i> Get Recommendations
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-redo"></i> Clear Form
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Results Section -->
+                <div class="card" id="resultsSection">
+                    <div class="card-header">
+                        <i class="fas fa-file-medical-alt"></i>
+                        <h2>Medical Recommendations</h2>
+                    </div>
+                    
+                    <div id="emergencyAlert" class="emergency-alert" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>
+                            <strong>Emergency Warning</strong><br>
+                            <span id="emergencyMessage"></span><br>
+                            <strong>Please seek immediate medical attention!</strong>
+                        </div>
+                    </div>
+                    
+                    <div id="resultsContainer">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner"></div>
+                    <p>Analyzing your symptoms and checking medical database...</p>
+                    <p class="text-muted">This may take a few seconds</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <div class="disclaimer-text">
+                    <strong>Disclaimer:</strong> MediExpert is an educational tool and does not provide medical advice, 
+                    diagnosis, or treatment. The information provided should not be used for self-diagnosis or self-treatment. 
+                    Always consult with qualified healthcare providers for any health concerns.
+                </div>
+                <div class="copyright">
+                    &copy;  All rights reserved by Magesh & Co.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Predefined symptoms (fallback if API fails)
+        // Replace the entire defaultSymptoms array with this:
+const defaultSymptoms = [
+    // 🫁 Respiratory Symptoms
+    'Cough', 'Runny nose', 'Sneezing', 'Nasal congestion', 'Sore throat', 'Hoarseness', 'Shortness of breath', 'Wheezing',
+    
+    // 🤢 Gastrointestinal Symptoms  
+    'Nausea', 'Vomiting', 'Diarrhea', 'Constipation', 'Indigestion', 'Bloating / Gas', 'Abdominal pain', 'Persistent vomiting', 'Blood in vomit or stool', 'Severe abdominal pain',
+    
+    // 🧠 Neurological & Mental Symptoms
+    'Headache', 'Dizziness', 'Insomnia', 'Anxiety', 'Seizures / Tremors', 'Memory loss / Confusion', 'Sudden severe headache',
+    
+    // 🧍‍♂️ Musculoskeletal Symptoms
+    'Body aches', 'Joint pain', 'Back pain', 'Cramps', 'Stiff neck',
+    
+    // 🧴 Skin & External Symptoms
+    'Rash / Itching', 'Dry skin', 'Blisters', 'Bruising', 'Hair loss', 'Yellowing of skin/eyes (jaundice)', 'Rapidly spreading rash or infection',
+    
+    // 💧 Urinary & Reproductive Symptoms
+    'Painful urination', 'Frequent urination', 'Menstrual cramps', 'Vaginal discharge', 'Blood in urine', 'Painful urination with fever', 'Erectile dysfunction (persistent)',
+    
+    // 👁️ EENT Symptoms
+    'Eye redness', 'Ear pain', 'Nosebleeds', 'Blurred or double vision', 'Eye pain with vision loss', 'Ringing in ears (persistent)',
+    
+    // 🌡️ General / Systemic
+    'Fever', 'Chills', 'Fatigue', 'Loss of appetite', 'Unexplained weight loss', 'Swollen lymph nodes (persistent)', 'Recurring fever',
+    
+    // 🧪 Cardiovascular
+    'Palpitations / Irregular heartbeat', 'Swelling in legs (persistent)', 'High/Low blood pressure (symptomatic)', 'Fainting episodes'
+    ];
+
+        // Custom symptoms array
+        let customSymptoms = [];
+
+        // API Configuration
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSymptomsFromAPI();
+            setupEventListeners();
+        });
+
+        // Load symptoms from backend API
+        async function loadSymptomsFromAPI() {
+            try {
+                showLoading('Loading symptoms...');
+                const response = await fetch(`${API_BASE}/symptoms`);
+                const data = await response.json();
+                
+                if (response.ok && data.symptoms) {
+                    initializeSymptomsGrid(data.symptoms);
+                } else {
+                    throw new Error('Failed to load symptoms from API');
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                // Fallback to default symptoms
+                initializeSymptomsGrid(defaultSymptoms);
+                showNotification('Using offline symptom database', 'warning');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Populate symptoms grid
+        function initializeSymptomsGrid(symptoms) {
+            const symptomsGrid = document.getElementById('symptomsGrid');
+            symptomsGrid.innerHTML = '';
+            
+            symptoms.forEach(symptom => {
+                const symptomId = symptom.toLowerCase().replace(/ /g, '-');
+                const symptomElement = document.createElement('div');
+                symptomElement.className = 'symptom-option';
+                symptomElement.innerHTML = `
+                    <input type="checkbox" id="${symptomId}" value="${symptom}">
+                    <label for="${symptomId}">${symptom}</label>
+                `;
+                symptomsGrid.appendChild(symptomElement);
+                
+                // Add click event to the entire div
+                symptomElement.addEventListener('click', function(e) {
+                    const checkbox = this.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
+                    updateDiagnoseButton();
+                });
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Age validation
+            document.getElementById('age').addEventListener('input', function() {
+                const age = parseInt(this.value);
+                if (age && (age < 1 || age > 120)) {
+                    this.setCustomValidity('Please enter a valid age between 1 and 120');
+                } else {
+                    this.setCustomValidity('');
+                }
+                updateDiagnoseButton();
+            });
+
+            // Gender change
+            document.getElementById('gender').addEventListener('change', updateDiagnoseButton);
+
+            // Enter key for custom symptom input
+            document.getElementById('customSymptom').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addCustomSymptom();
+                }
+            });
+
+            // Severity change
+            document.querySelectorAll('input[name="severity"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    checkEmergencyConditions();
+                });
+            });
+        }
+
+        // Add custom symptom
+        function addCustomSymptom() {
+            const customSymptomInput = document.getElementById('customSymptom');
+            const symptom = customSymptomInput.value.trim();
+            
+            if (symptom) {
+                if (customSymptoms.includes(symptom)) {
+                    showNotification('This symptom has already been added', 'warning');
+                } else if (symptom.length < 2) {
+                    showNotification('Please enter a valid symptom description', 'warning');
+                } else {
+                    customSymptoms.push(symptom);
+                    updateCustomSymptomsList();
+                    customSymptomInput.value = '';
+                    showNotification('Symptom added successfully', 'success');
+                    updateDiagnoseButton();
+                }
+            } else {
+                showNotification('Please enter a symptom description', 'warning');
+            }
+        }
+
+        // Update custom symptoms list display
+        function updateCustomSymptomsList() {
+            const customSymptomsList = document.getElementById('customSymptomsList');
+            customSymptomsList.innerHTML = '';
+            
+            customSymptoms.forEach((symptom, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'custom-symptom-tag';
+                tag.innerHTML = `
+                    ${symptom}
+                    <button onclick="removeCustomSymptom(${index})" title="Remove symptom">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                customSymptomsList.appendChild(tag);
+            });
+        }
+
+        // Remove custom symptom
+        function removeCustomSymptom(index) {
+            customSymptoms.splice(index, 1);
+            updateCustomSymptomsList();
+            updateDiagnoseButton();
+            showNotification('Symptom removed', 'info');
+        }
+
+        // Check for emergency conditions
+        function checkEmergencyConditions() {
+            const severity = document.querySelector('input[name="severity"]:checked').value;
+            const selectedSymptoms = getSelectedSymptoms();
+            
+            const emergencySymptoms = ['Chest pain', 'Shortness of breath', 'Severe abdominal pain'];
+            const hasEmergencySymptoms = selectedSymptoms.some(symptom => 
+                emergencySymptoms.includes(symptom)
+            );
+            
+            if (severity === 'severe' && hasEmergencySymptoms) {
+                showNotification('Emergency symptoms detected! Please seek immediate medical attention.', 'danger');
+            }
+        }
+
+        // Get all selected symptoms
+        function getSelectedSymptoms() {
+            const selectedSymptoms = [];
+            
+            // Get predefined symptoms
+            const checkboxes = document.querySelectorAll('.symptom-option input:checked');
+            checkboxes.forEach(checkbox => {
+                selectedSymptoms.push(checkbox.value);
+            });
+            
+            // Add custom symptoms
+            selectedSymptoms.push(...customSymptoms);
+            
+            return selectedSymptoms;
+        }
+
+        // Get patient information
+        function getPatientInfo() {
+            return {
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                pregnancy: document.getElementById('pregnancy').checked,
+                allergies: document.getElementById('allergies').checked,
+                chronic: document.getElementById('chronic').checked,
+                severity: document.querySelector('input[name="severity"]:checked').value
+            };
+        }
+
+        // Update diagnose button state
+        function updateDiagnoseButton() {
+            const patientInfo = getPatientInfo();
+            const symptoms = getSelectedSymptoms();
+            const diagnoseBtn = document.getElementById('diagnoseBtn');
+            
+            const hasAge = patientInfo.age && patientInfo.age >= 1 && patientInfo.age <= 120;
+            const hasGender = patientInfo.gender;
+            const hasSymptoms = symptoms.length > 0;
+            
+            diagnoseBtn.disabled = !(hasAge && hasGender && hasSymptoms);
+        }
+
+        // Get recommendations from backend
+        async function getRecommendations() {
+            if (!validateForm()) return;
+            
+            const patientInfo = getPatientInfo();
+            const symptoms = getSelectedSymptoms();
+            
+            showLoading('Analyzing symptoms and generating recommendations...');
+            disableForm(true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/diagnose`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...patientInfo,
+                        symptoms: symptoms
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data);
+                    showNotification('Recommendations generated successfully!', 'success');
+                } else {
+                    throw new Error(data.error || 'Diagnosis failed');
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                showNotification('Error: ' + error.message, 'danger');
+                // Show fallback recommendations
+                displayResults(generateFallbackRecommendations(patientInfo, symptoms));
+            } finally {
+                hideLoading();
+                disableForm(false);
+            }
+        }
+
+        // Validate form before submission
+        function validateForm() {
+            const patientInfo = getPatientInfo();
+            const symptoms = getSelectedSymptoms();
+            const errors = [];
+            
+            if (!patientInfo.age) {
+                errors.push('Please enter your age');
+            } else if (patientInfo.age < 1 || patientInfo.age > 120) {
+                errors.push('Please enter a valid age between 1 and 120');
+            }
+            
+            if (!patientInfo.gender) {
+                errors.push('Please select your gender');
+            }
+            
+            if (symptoms.length === 0) {
+                errors.push('Please select at least one symptom');
+            }
+            
+            if (errors.length > 0) {
+                showNotification(errors[0], 'warning');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Display results
+        function displayResults(data) {
+            const resultsSection = document.getElementById('resultsSection');
+            const emergencyAlert = document.getElementById('emergencyAlert');
+            const emergencyMessage = document.getElementById('emergencyMessage');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Show/hide emergency alert
+            if (data.emergency_warning) {
+                emergencyMessage.textContent = data.emergency_warning;
+                emergencyAlert.style.display = 'flex';
+            } else {
+                emergencyAlert.style.display = 'none';
+            }
+            
+            // Display recommendations
+            resultsContainer.innerHTML = '';
+            
+            if (data.recommendations && data.recommendations.length > 0) {
+                data.recommendations.forEach((rec, index) => {
+                    const medicineCard = document.createElement('div');
+                    medicineCard.className = 'medicine-card fade-in-up';
+                    medicineCard.style.animationDelay = `${index * 0.1}s`;
+                    
+                    medicineCard.innerHTML = `
+                        <div class="medicine-header">
+                            <div>
+                                <span class="medicine-name">${rec.medicine}</span>
+                                <span class="medicine-type">${rec.type || 'OTC'}</span>
+                            </div>
+                            <div class="confidence">${rec.confidence || 80}% Match</div>
+                        </div>
+                        <div class="medicine-details">
+                            <p><strong>Uses:</strong> ${rec.uses || 'Symptom relief'}</p>
+                            ${rec.dosage ? `<p><strong>Dosage:</strong> ${rec.dosage}</p>` : ''}
+                        </div>
+                        ${rec.warnings && rec.warnings.length > 0 ? 
+                            `<div class="warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>${rec.warnings.join(' • ')}</span>
+                            </div>` : ''}
+                        <div class="advice">
+                            <i class="fas fa-info-circle"></i>
+                            ${rec.advice || 'Consult a doctor if symptoms persist for more than 3 days'}
+                        </div>
+                    `;
+                    resultsContainer.appendChild(medicineCard);
+                });
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="medicine-card">
+                        <div class="medicine-header">
+                            <div class="medicine-name">No Specific Recommendations</div>
+                        </div>
+                        <div class="medicine-details">
+                            <p>Based on your symptoms, we recommend consulting with a healthcare professional 
+                            for proper diagnosis and treatment.</p>
+                        </div>
+                        <div class="advice">
+                            <i class="fas fa-info-circle"></i>
+                            Please see a doctor for personalized medical advice
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Show results section with animation
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Generate fallback recommendations when API is unavailable
+        function generateFallbackRecommendations(patientInfo, symptoms) {
+            const medicineDatabase = {
+                'Headache': [
+                    { medicine: 'Acetaminophen', type: 'OTC', uses: 'Pain and fever relief', 
+                      dosage: '500-1000mg every 4-6 hours', confidence: 85 }
+                ],
+                'Fever': [
+                    { medicine: 'Ibuprofen', type: 'OTC', uses: 'Reduces fever and inflammation', 
+                      dosage: '200-400mg every 6-8 hours', confidence: 90 }
+                ],
+                'Cough': [
+                    { medicine: 'Dextromethorphan', type: 'OTC', uses: 'Cough suppression', 
+                      dosage: '10-20mg every 4-6 hours', confidence: 75 }
+                ],
+                'Sore throat': [
+                    { medicine: 'Lozenges with Benzocaine', type: 'OTC', uses: 'Throat pain relief', 
+                      dosage: '1 lozenge every 2-4 hours', confidence: 80 }
+                ],
+                'Body aches': [
+                    { medicine: 'Naproxen', type: 'OTC', uses: 'Muscle pain and inflammation', 
+                      dosage: '220mg every 8-12 hours', confidence: 80 }
+                ]
+            };
+            
+            const recommendations = [];
+            const usedMedicines = new Set();
+            
+            symptoms.forEach(symptom => {
+                if (medicineDatabase[symptom]) {
+                    medicineDatabase[symptom].forEach(medicine => {
+                        if (!usedMedicines.has(medicine.medicine)) {
+                            // Add safety warnings
+                            const warnings = [];
+                            if (patientInfo.age < 12) warnings.push('Consult pediatrician before use');
+                            if (patientInfo.pregnancy) warnings.push('Consult doctor during pregnancy');
+                            if (patientInfo.allergies) warnings.push('Check for allergies');
+                            
+                            recommendations.push({
+                                ...medicine,
+                                warnings: warnings,
+                                advice: 'Consult a doctor if symptoms persist for more than 3 days'
+                            });
+                            usedMedicines.add(medicine.medicine);
+                        }
+                    });
+                }
+            });
+            
+            return {
+                emergency_warning: null,
+                recommendations: recommendations.length > 0 ? recommendations : [
+                    {
+                        medicine: 'Consult Healthcare Provider',
+                        type: 'Medical Advice',
+                        uses: 'Professional medical evaluation needed',
+                        confidence: 95,
+                        warnings: ['Self-treatment not recommended for these symptoms'],
+                        advice: 'Please see a doctor for proper diagnosis and treatment'
+                    }
+                ]
+            };
+        }
+
+        // Clear form
+        function clearForm() {
+            // Reset form inputs
+            document.getElementById('age').value = '';
+            document.getElementById('gender').value = '';
+            document.getElementById('pregnancy').checked = false;
+            document.getElementById('allergies').checked = false;
+            document.getElementById('chronic').checked = false;
+            document.getElementById('customSymptom').value = '';
+            
+            // Reset symptoms
+            const checkboxes = document.querySelectorAll('.symptom-option input');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            const symptomOptions = document.querySelectorAll('.symptom-option');
+            symptomOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Reset severity
+            document.getElementById('severity-mild').checked = true;
+            
+            // Clear custom symptoms
+            customSymptoms = [];
+            updateCustomSymptomsList();
+            
+            // Hide results
+            document.getElementById('resultsSection').style.display = 'none';
+            
+            // Reset button state
+            updateDiagnoseButton();
+            
+            showNotification('Form cleared successfully', 'info');
+        }
+
+        // Show loading state
+        function showLoading(message = 'Loading...') {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = 'flex';
+            if (message) {
+                spinner.querySelector('p').textContent = message;
+            }
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        // Disable/enable form
+        function disableForm(disabled) {
+            const inputs = document.querySelectorAll('input, select, button');
+            inputs.forEach(input => {
+                if (input.id !== 'diagnoseBtn') {
+                    input.disabled = disabled;
+                }
+            });
+            document.getElementById('diagnoseBtn').disabled = disabled;
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-${getNotificationIcon(type)}"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            // Add styles for notification
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    .notification {
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        z-index: 1000;
+                        animation: slideInRight 0.3s ease;
+                    }
+                    .notification-content {
+                        background: white;
+                        padding: 1rem 1.5rem;
+                        border-radius: var(--radius);
+                        box-shadow: var(--shadow-lg);
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        border-left: 4px solid var(--primary);
+                    }
+                    .notification-success .notification-content {
+                        border-left-color: var(--success);
+                    }
+                    .notification-warning .notification-content {
+                        border-left-color: var(--warning);
+                    }
+                    .notification-danger .notification-content {
+                        border-left-color: var(--danger);
+                    }
+                    .notification-content button {
+                        background: none;
+                        border: none;
+                        color: var(--gray-600);
+                        cursor: pointer;
+                    }
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function getNotificationIcon(type) {
+            const icons = {
+                'success': 'check-circle',
+                'warning': 'exclamation-triangle',
+                'danger': 'exclamation-circle',
+                'info': 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // Initialize diagnose button state
+        updateDiagnoseButton();
+    </script>
+</body>
+</html>
